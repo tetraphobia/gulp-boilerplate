@@ -15,7 +15,7 @@ const dirs = {
     in: {
         pug: 'src/pug/*.pug',
         sass: 'src/sass/*.sass',
-        js: 'src/js/*.js'
+        js: 'src/js/*.ts'
     },
     out: {
         pug: gulpdist,
@@ -30,32 +30,23 @@ const gulp = require('gulp');
 const pug = require('gulp-pug');
 const sass = require('gulp-sass');
 const concat = require('gulp-concat');
-const jshint = require('gulp-jshint');
 const terse = require('gulp-terser');
 const browsersync = require('browser-sync');
+const ts = require('gulp-typescript');
 
 sass.compiler = require('node-sass')
 
 
 // Functions
-function lintJS(done){
-    if (!opts.lint) return done();
 
+function build_ts(done){
     return gulp.src(dirs.in.js)
-        .pipe(jshint({
-            // JShint opts
+        .pipe(ts({
+            noImplicitAny: true,
+            outFile: 'bundle.js'
         }))
-}
-
-function buildJS(done){
-    if (!opts.js) return done();
-
-    return gulp.src(dirs.in.js)
-        .pipe(concat('bundle.js'))
-        .pipe(terse())
         .pipe(gulp.dest(dirs.out.js))
 }
-
 function build_sass(done){
     if (!opts.sass) return done();
 
@@ -104,7 +95,7 @@ function bswatch(done){
 }
 
 // Exports
-const build = gulp.series(clean, build_sass, lintJS, buildJS, build_pug);
+const build = gulp.series(clean, build_sass, build_ts, build_pug);
 exports.default = build;
 
 const srv = gulp.series(exports.default, startSrv, bswatch)

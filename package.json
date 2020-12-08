@@ -17,5 +17,8 @@
     "gulp-terser": "^1.2.0",
     "jshint": "^2.11.1",
     "node-sass": "^4.14.1"
+  },
+  "dependencies": {
+    "gulp-typescript": "^6.0.0-alpha.1"
   }
 }
