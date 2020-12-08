@@ -15,7 +15,7 @@ const dirs = {
     in: {
         pug: 'src/pug/*.pug',
         sass: 'src/sass/*.sass',
-        js: 'src/js/*.ts'
+        ts: 'src/ts/*.ts'
     },
     out: {
         pug: gulpdist,
@@ -34,17 +34,16 @@ const terse = require('gulp-terser');
 const browsersync = require('browser-sync');
 const ts = require('gulp-typescript');
 
+const tsProject = ts.createProject('tsconfig.json', {noImplicitAny: true});
 sass.compiler = require('node-sass')
 
 
 // Functions
 
 function build_ts(done){
-    return gulp.src(dirs.in.js)
-        .pipe(ts({
-            noImplicitAny: true,
-            outFile: 'bundle.js'
-        }))
+    return gulp.src(dirs.in.ts)
+        .pipe(tsProject())
+        .pipe(concat('bundle.js'))
         .pipe(gulp.dest(dirs.out.js))
 }
 function build_sass(done){
