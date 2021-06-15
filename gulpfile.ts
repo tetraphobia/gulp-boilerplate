@@ -1,46 +1,76 @@
-import {src, dest, series, watch} from 'gulp'
-import sass from 'gulp-sass';
+import {
+    parallel,
+    series,
+    src,
+    dest,
+    watch,
+} from 'gulp';
+
+import {createProject} from 'gulp-typescript';
+import sourcemaps from 'gulp-sourcemaps';
+import sass from 'gulp-dart-sass';
+import babel from 'gulp-babel';
+import uglify from 'gulp-uglify';
+import htmlmin from 'gulp-htmlmin';
+import browsersync from 'browser-sync'
 import concat from 'gulp-concat';
-import {init, stream, reload} from 'browser-sync';
 
-// Initialize config.
-import Config from './config'
-const {outDir, htmlGlob, sassGlob, tsGlob, jsBundle, cssBundle, bsOpts} = Config
+// HTML functions
+const htmlCopy = () =>
+    src('src/html/**/*.html')
+        .pipe(dest('./dist/'))
 
-// Initialize Typescript project.
-import {createProject} from 'gulp-typescript'
-const TypeScript = createProject('tsconfig.json')
+const htmlMinify = () =>
+    src('src/html/**/*.html')
+        .pipe(htmlmin({
+            collapseWhitespace: true
+        }))
+        .pipe(dest('./dist/'))
 
-// Gulp tasks.
-const compileTS = () =>
-    TypeScript.src()
-        .pipe(TypeScript())
+// Typescript functions
+const proj = createProject('tsconfig.json')
+const tsBuild= () =>
+    proj.src()
+        .pipe(sourcemaps.init())
+        .pipe(proj())
         .js
-        .pipe(concat(jsBundle))
-        .pipe(dest(outDir))
-        .pipe(stream())
+        .pipe(concat('bundle.js'))
+        .pipe(dest('./dist/'))
 
-const compileHTML = () =>
-    src(htmlGlob)
-        .pipe(dest(outDir))
-        .pipe(stream())
+const tsMinify = () =>
+    proj.src()
+        .pipe(sourcemaps.init())
+        .pipe(proj())
+        .js
+        .pipe(babel({
+            presets: ['@babel/preset-env']
+        }))
+        .pipe(concat('bundle.js'))
+        .pipe(uglify())
+        .pipe(dest('./dist/'))
 
-const compileSASS = () =>
-    src(sassGlob)
-        .pipe(sass())
-        .pipe(concat(cssBundle))
-        .pipe(dest(outDir))
-        .pipe(stream())
+// Sass functions
+const sassBuild = () =>
+    src('src/sass/**/*.scss')
+        .pipe(sourcemaps.init())
+        .pipe(sass().on('error', sass.logError))
+        .pipe(concat('bundle.css'))
+        .pipe(dest('./dist/'))
 
-exports.srv = (callback: () => any) => {
-    exports.build()
-    init(bsOpts)
+// Browsersync server
+const bs = browsersync.create()
+const devServer = () => {
+    bs.init({
+        server: {
+            baseDir: 'dist/'
+        }
+    })
+    watch('src/sass/**/*.scss', sassBuild).on('change', bs.reload)
+    watch('src/html/**/*.html', htmlCopy).on('change', bs.reload)
+    watch('src/ts/**/*.ts', tsBuild).on('change', bs.reload)
 
-    watch(htmlGlob, compileHTML)
-    watch(sassGlob, compileSASS)
-    watch(tsGlob, compileTS)
-    callback()
 }
 
-exports.build = series(compileSASS, compileTS, compileHTML)
-exports.default = exports.build
+exports.default = series(htmlCopy, tsBuild, sassBuild, devServer)
+
+exports.build = parallel(htmlMinify, tsMinify, sassBuild)
