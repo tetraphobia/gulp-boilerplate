@@ -1,14 +1,9 @@
 {
-  "files": ["src/ts/**/*.ts"],
-  "compilerOptions": {
-    "module": "commonjs",
-    "target": "es2015",
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "noImplicitAny": true,
-    "strict": true,
-    "rootDir": ".",
-    "outDir": "dist"
-  }
+    "files": ["src/**/*.ts"],
+    "compilerOptions": {
+        "module": "commonjs",
+        "noImplicitAny": true,
+        "target": "es2018",
+        "sourceMap": true
+    }
 }

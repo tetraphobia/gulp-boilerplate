@@ -1,2 +1,2 @@
-# gulp-boilerplate (OLD)
-A template for gulp projects.
+# gulp-boilerplate v2
+A basic boilerplate for gulp projects.

@@ -1,12 +1,6 @@
 # Distribution files
 dist/
 
-# Compiled files
-src/**/*.html
-src/**/*.css
-src/**/*.map
-
-
 # Logs
 logs
 *.log
