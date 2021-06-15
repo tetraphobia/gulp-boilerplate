@@ -7,12 +7,12 @@ import {
 } from 'gulp';
 
 import {createProject} from 'gulp-typescript';
-import * as sourcemaps from 'gulp-sourcemaps';
-import * as sass from 'gulp-dart-sass';
-import * as babel from 'gulp-babel';
-import * as uglify from 'gulp-uglify';
-import * as htmlmin from 'gulp-htmlmin';
-import * as browsersync from 'browser-sync'
+import sourcemaps from 'gulp-sourcemaps';
+import sass from 'gulp-dart-sass';
+import babel from 'gulp-babel';
+import uglify from 'gulp-uglify';
+import htmlmin from 'gulp-htmlmin';
+import browsersync from 'browser-sync'
 import concat from 'gulp-concat';
 
 // HTML functions
@@ -65,7 +65,7 @@ const devServer = () => {
             baseDir: 'dist/'
         }
     })
-    watch('src/sass/**/*.scss', sassBuild)
+    watch('src/sass/**/*.scss', sassBuild).on('change', bs.reload)
     watch('src/html/**/*.html', htmlCopy).on('change', bs.reload)
     watch('src/ts/**/*.ts', tsBuild).on('change', bs.reload)
 
